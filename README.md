@@ -1,5 +1,4 @@
 # Advanced Lane Detection
-![annotated](output_images/annotated_test2.png)
 ## Overview
 Detect lanes using computer vision techniques. This project is part of the [Udacity Self-Driving Car Nanodegree](https://www.udacity.com/drive), and much of the code is leveraged from the lecture notes.
 
@@ -14,14 +13,6 @@ The following steps were performed for lane detection:
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-[Here](https://youtu.be/lSd_WY1bqLw) is the final video output on Youtube. The same video is 'out.mp4' in this repo. The original video is 'project_video.mp4'.
-
-## Dependencies
-* Python 3.5
-* Numpy
-* OpenCV-Python
-* Matplotlib
-* Pickle
 
 ## How to run
 * Run `AdvancedLaneFindingProject.ipynb`
@@ -37,53 +28,76 @@ The following steps were performed for each calibration image:
 * Read the image
 * Convert image to grayscale
 * Find chessboard corners with OpenCV's `cv2.findChessboardCorners`
+* Draw chessboard corners with OpenCV's `cv2.drawChessboardCorners`
 * objectpoints and imagepoints were stored for future reference
 * Board was assumed to be 9*6
 
 ![](output_images/chesscorners.PNG)
 
 After the above steps were executed for all calibration images: 
+* `undistort()` method is used that lies in  `AdvancedLaneFindingProject.ipynb`
 * distortion matrices were calculated using `cv2.calibrateCamera`
 * undistort image using `cv1.undistort`
 
-![](output_images/undistort.PNG)
+![temp](output_images/undistorted.PNG)
 
-Here is the same image undistored via camera calibration:
-![undist_cal5](output_images/undistort_calibration.png)
+Here is the actual image undistorted via camera calibration:
+![](output_images/undistortedlane.PNG)
 
-### Undistort image
-Using the camera calibration matrices in 'calibrate_camera.p', I undistort the input image. Below is the example image above, undistorted:
+### Prespective transform
+* `prespectiveTransform()` method is used that lies in  `AdvancedLaneFindingProject.ipynb`
+* Given the thresholded binary image, the next step is to perform a perspective transform. The goal is to transform the image such that we get a "bird's eye view" of the lane, which enables us to fit a curved line to the lane lines (e.g. polynomial fit). Another thing this accomplishes is to "crop" an area of the original image that is most likely to have the lane line pixels.
 
-![undist](output_images/undistort_test2.png)
-
-The code to perform camera calibration is in 'calibrate_camera.py'. For all images in 'test_images/\*.jpg', the undistorted version of that image is saved in 'output_images/undistort_\*.png'.
-
-### Thresholded binary image
-The next step is to create a thresholded binary image, taking the undistorted image as input. The goal is to identify pixels that are likely to be part of the lane lines. In particular, I perform the following:
-
-* Apply the following filters with thresholding, to create separate "binary images" corresponding to each individual filter
-  * Absolute horizontal Sobel operator on the image
-  * Sobel operator in both horizontal and vertical directions and calculate its magnitude
-  * Sobel operator to calculate the direction of the gradient
-  * Convert the image from RGB space to HLS space, and threshold the S channel
-* Combine the above binary images to create the final binary image
-
-Here is the example image, transformed into a binary image by combining the above thresholded binary filters:
-
-![binary](output_images/binary_test2.png)
-
-The code to generate the thresholded binary image is in 'combined_thresh.py', in particular the function `combined_thresh()`. For all images in 'test_images/\*.jpg', the thresholded binary version of that image is saved in 'output_images/binary_\*.png'.
-
-### Perspective transform
-Given the thresholded binary image, the next step is to perform a perspective transform. The goal is to transform the image such that we get a "bird's eye view" of the lane, which enables us to fit a curved line to the lane lines (e.g. polynomial fit). Another thing this accomplishes is to "crop" an area of the original image that is most likely to have the lane line pixels.
-
-To accomplish the perspective transform, I use OpenCV's `getPerspectiveTransform()` and `warpPerspective()` functions. I hard-code the source and destination points for the perspective transform. The source and destination points were visually determined by manual inspection, although an important enhancement would be to algorithmically determine these points.
+* To accomplish the perspective transform, I use OpenCV's `getPerspectiveTransform()` and `warpPerspective()` functions
 
 Here is the example image, after applying perspective transform:
 
-![warped](output_images/warped_test2.png)
+![](output_images/prespective.PNG)
 
-The code to perform perspective transform is in 'perspective_transform.py', in particular the function `perspective_transform()`. For all images in 'test_images/\*.jpg', the warped version of that image (i.e. post-perspective-transform) is saved in 'output_images/warped_\*.png'.
+### Sobel Gradient Magnitude Threshold
+* Next step was to calculate sobel gradient magnitude threshhold
+* `mag_thresh()` method is used that lies in  `AdvancedLaneFindingProject.ipynb`
+* A function that applies Sobel x and y, then computes the magnitude of the gradient and applies a threshold
+* sobel_kernel was defaulted to 3 and mag_thresh to (20,255)
+* `cv2.sobel()` was used to calculate sobel gradient
+
+Here is the output from above process:
+![](output_images/sobelmagnitude.PNG)
+
+
+### Sobel Gradient Direction Threshold
+* Next step was to calculate sobel gradient direction threshhold
+* `dir_threshold()` method is used that lies in  `AdvancedLaneFindingProject.ipynb`
+* A function that applies Sobel x and y, then computes the direction of the gradient and applies a threshold
+* sobel_kernel was defaulted to 15 and thresh to (0,0.1)
+* `cv2.sobel()` was used to calculate sobel gradient
+* `np.arctan2(abs_sobely, abs_sobelx)` is used to calculate the direction of the gradient 
+
+Here is the output from above process:
+![](output_images/sobeldirection.PNG)
+
+### combined sobel output
+![](output_images/sobelboth.PNG)
+
+### color threshholds
+* I ran a image through various threshold color values and found that
+* LAB B-channel and HLS S-channel was best fit
+* added two methods `lab_bthresh()` and `hls_lthresh()` to do same
+
+### Threshold binary image
+* The next step was to connect all the previous operations to create a threshold binary image
+* following steps were performed for pipeline:
+  * undistort()
+  * prespectiveTransform()
+  * mag_thresh()
+  * dir_threshold()
+  * img_lthresh()
+  * img_bthresh()
+  * combined the sobel and color threshold to generate final binary image
+  * All the operation performed are already explained above
+* Below is the ouput of pipeline
+
+![](output_images/pipeline.PNG)
 
 ### Polynomial fit
 Given the warped binary image from the previous step, I now fit a 2nd order polynomial to both left and right lane lines. In particular, I perform the following:
