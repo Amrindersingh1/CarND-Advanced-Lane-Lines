@@ -39,23 +39,17 @@ The following steps were performed for each calibration image:
 * Find chessboard corners with OpenCV's `cv2.findChessboardCorners`
 * objectpoints and imagepoints were stored for future reference
 * Board was assumed to be 9*6
-![calibration1](output_images/chesscorners.png)
 
-After the above steps were executed for all calibration images, distortion matrices were calculated
-* 
+![](output_images/chesscorners.PNG)
 
-To illustrate, the following is the calibration image 'camera_cal/calibration5.jpg':
-![calibration5](camera_cal/calibration5.jpg)
+After the above steps were executed for all calibration images: 
+* distortion matrices were calculated using `cv2.calibrateCamera`
+* undistort image using `cv1.undistort`
+
+![](output_images/undistort.PNG)
 
 Here is the same image undistored via camera calibration:
 ![undist_cal5](output_images/undistort_calibration.png)
-
-The final calibration matrices are saved in the pickle file 'calibrate_camera.p'
-
-## Lane detection pipeline
-The following describes and illustrates the steps involved in the lane detection pipeline. For illustration, below is the original image we will use as an example:
-
-![orig](test_images/test2.jpg)
 
 ### Undistort image
 Using the camera calibration matrices in 'calibrate_camera.p', I undistort the input image. Below is the example image above, undistorted:
