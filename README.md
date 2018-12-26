@@ -39,6 +39,7 @@ The following steps were performed for each calibration image:
 * Find chessboard corners with OpenCV's `cv2.findChessboardCorners`
 * objectpoints and imagepoints were stored for future reference
 * Board was assumed to be 9*6
+![calibration1](output_images/chesscorners.png)
 
 After the above steps were executed for all calibration images, distortion matrices were calculated
 * 
