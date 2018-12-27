@@ -150,7 +150,7 @@ The code to calculate the vehicle's lane offset is in the function `centreDaviat
  * invalidate both fits if the difference in their x-intercepts isn't around 350 px (+/- 100 px)
  * draw the current best fit if it exists
 
-### Finally ran pipeline through all the images and also through project video . The output can be found inline in `AdvancedLaneFindingProject.ipynb` notebook
+### Finally ran pipeline through all the images and also through project video . The output can be found inline in `AdvancedLaneFindingProject.ipynb` notebook and final project output video is at './project_video_output.mp4'
 
 ## Discussion
 This is an initial version of advanced computer-vision-based lane finding. 
