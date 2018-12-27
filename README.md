@@ -116,6 +116,8 @@ Given the output image from the previous step, I now fit a 2nd order polynomial 
 Now that we have found all our pixels belonging to each line through the sliding window method, it's time to fit a polynomial to the line.
 * `prev_fit()` method is used that lies in  `AdvancedLaneFindingProject.ipynb`
 
+![](output_images/laneDetected.PNG)
+
 ### Radius of curvature
 Given the polynomial fit for the left and right lane lines, I calculated the radius of curvature for each line.
 I also converted the distance units from pixels to meters, assuming 30 meters per 720 pixels in the vertical direction, and 3.7 meters per 700 pixels in the horizontal direction.
